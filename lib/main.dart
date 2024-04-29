@@ -1,18 +1,17 @@
+// ignore_for_file: prefer_typing_uninitialized_variables, library_private_types_in_public_api
+
 import 'dart:io';
-
 import 'package:flutter/material.dart';
-
 import 'package:image_picker/image_picker.dart';
-import 'package:mask_detect/Image_compressor.dart';
-import 'package:mask_detect/Page1.dart';
-import 'package:mask_detect/Sell_Page.dart';
-// import 'package:tflite/tflite.dart';
+import 'package:tflite/tflite.dart';
 
 void main() {
-  runApp(MyApp1());
+  runApp(const MyApp());
 }
 
 class MyApp extends StatelessWidget {
+  const MyApp({super.key});
+
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
@@ -20,174 +19,175 @@ class MyApp extends StatelessWidget {
       theme: ThemeData(
         brightness: Brightness.dark,
       ),
-      home: Sell_Page(),
+      home: const Home(),
     );
   }
 }
 
-// class Home extends StatefulWidget {
-//   @override
-//   _HomeState createState() => _HomeState();
-// }
+class Home extends StatefulWidget {
+  const Home({super.key});
 
-// class _HomeState extends State<Home> {
-//   bool loading = true;
-//   File? file;
-//   var output;
-//   var label;
-//   var fine;
-//   ImagePicker image = ImagePicker();
-//   var gfg = {
-//     'with_mask': 'no_fine',
-//     'without_mask': 'Fine_100_dollar',
-//   };
+  @override
+  _HomeState createState() => _HomeState();
+}
 
-//   @override
-//   void initState() {
-//     super.initState();
-//     loadmodel().then((value) {
-//       setState(() {});
-//     });
-//   }
+class _HomeState extends State<Home> {
+  bool loading = true;
+  File? file;
+  var output;
+  var label;
+  var fine;
+  ImagePicker image = ImagePicker();
+  var gfg = {
+    'with_mask': 'no_fine',
+    'without_mask': 'Fine_100_dollar',
+  };
 
-//   detectimage(File l) async {
-//     var prediction = await Tflite.runModelOnImage(
-//       path: l.path,
-//       numResults: 2,
-//       threshold: 0.6,
-//       imageMean: 127.5,
-//       imageStd: 127.5,
-//     );
+  @override
+  void initState() {
+    super.initState();
+    loadmodel().then((value) {
+      setState(() {});
+    });
+  }
 
-//     setState(() {
-//       output = prediction;
-//       label = (output![0]['label']).toString().substring(2);
-//       fine = gfg[label];
-//       loading = false;
-//     });
-//   }
+  detectimage(File l) async {
+    var prediction = await Tflite.runModelOnImage(
+      path: l.path,
+      numResults: 2,
+      threshold: 0.6,
+      imageMean: 127.5,
+      imageStd: 127.5,
+    );
 
-//   loadmodel() async {
-//     await Tflite.loadModel(
-//       model: "assets/model_unquant.tflite",
-//       labels: "assets/labels.txt",
-//     );
-//   }
+    setState(() {
+      output = prediction;
+      label = (output![0]['label']).toString().substring(2);
+      fine = gfg[label];
+      loading = false;
+    });
+  }
 
-//   @override
-//   void dispose() {
-//     super.dispose();
-//   }
+  loadmodel() async {
+    await Tflite.loadModel(
+      model: "assets/model_unquant.tflite",
+      labels: "assets/labels.txt",
+    );
+  }
 
-//   getImageFromCamera() async {
-//     var img = await image.pickImage(source: ImageSource.camera);
+  @override
+  void dispose() {
+    super.dispose();
+  }
 
-//     setState(() {
-//       file = File(img!.path);
-//     });
-//     detectimage(file!);
-//   }
+  getImageFromCamera() async {
+    var img = await image.pickImage(source: ImageSource.camera);
 
-//   getImageFromGallery() async {
-//     var img = await image.pickImage(source: ImageSource.gallery);
+    setState(() {
+      file = File(img!.path);
+    });
+    detectimage(file!);
+  }
 
-//     setState(() {
-//       file = File(img!.path);
-//     });
-//     detectimage(file!);
-//   }
+  getImageFromGallery() async {
+    var img = await image.pickImage(source: ImageSource.gallery);
 
-//   @override
-//   Widget build(BuildContext context) {
-//     var h = MediaQuery.of(context).size.height;
-//     var w = MediaQuery.of(context).size.width;
-//     return Scaffold(
-//       backgroundColor: Colors.white,
-//       body: Container(
-//         height: h,
-//         width: w,
-//         child: Column(
-//           mainAxisAlignment: MainAxisAlignment.center,
-//           children: [
-//             Text(
-//               'Mask Detection App',
-//               style: TextStyle(
-//                   fontSize: 24,
-//                   fontWeight: FontWeight.bold,
-//                   color: Colors.black),
-//             ),
-//             SizedBox(height: 20),
-//             loading == true
-//                 ? Container()
-//                 : Container(
-//                     color: Colors.red,
-//                     child: Column(
-//                       children: [
-//                         Container(
-//                           height: 220,
-//                           padding: EdgeInsets.all(15),
-//                           child: Image.file(file!),
-//                         ),
-//                         Text(
-//                           (output![0]['label']).toString().substring(2),
-//                           style: TextStyle(
-//                             fontSize: 18,
-//                             fontWeight: FontWeight.bold,
-//                             color: Colors.white,
-//                           ),
-//                         ),
-//                         Text(
-//                           'Confidence: ' +
-//                               (output![0]['confidence']).toString(),
-//                           style: TextStyle(
-//                             fontSize: 16,
-//                             color: Colors.white,
-//                           ),
-//                         ),
-//                         Text(
-//                           fine,
-//                           style: TextStyle(
-//                             fontSize: 16,
-//                             color: Colors.white,
-//                           ),
-//                         ),
-//                       ],
-//                     ),
-//                   ),
-//             SizedBox(height: 100),
-//             Row(
-//               mainAxisAlignment: MainAxisAlignment.center,
-//               children: [
-//                 FloatingActionButton(
-//                   elevation: 0.0,
-//                   child: Icon(
-//                     Icons.image,
-//                   ),
-//                   backgroundColor: Color.fromARGB(255, 187, 188, 204),
-//                   onPressed: getImageFromGallery,
-//                 ),
-//                 SizedBox(width: 20),
-//                 FloatingActionButton(
-//                   elevation: 0.0,
-//                   child: Icon(
-//                     Icons.camera,
-//                   ),
-//                   backgroundColor: Color.fromARGB(255, 187, 188, 204),
-//                   onPressed: getImageFromCamera,
-//                 ),
-//               ],
-//             ),
-//             SizedBox(height: 30),
-//             Text(
-//               'Created By Ritesh Shandilya',
-//               style: TextStyle(
-//                 fontSize: 14,
-//                 color: Colors.grey,
-//               ),
-//             ),
-//           ],
-//         ),
-//       ),
-//     );
-//   }
-// }
+    setState(() {
+      file = File(img!.path);
+    });
+    detectimage(file!);
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    var h = MediaQuery.of(context).size.height;
+    var w = MediaQuery.of(context).size.width;
+    return Scaffold(
+      backgroundColor: Colors.white,
+      body: SizedBox(
+        height: h,
+        width: w,
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            const Text(
+              'Mask Detection App',
+              style: TextStyle(
+                  fontSize: 24,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.black),
+            ),
+            const SizedBox(height: 20),
+            loading == true
+                ? Container()
+                : Container(
+                    color: Colors.red,
+                    child: Column(
+                      children: [
+                        Container(
+                          height: 220,
+                          padding: const EdgeInsets.all(15),
+                          child: Image.file(file!),
+                        ),
+                        Text(
+                          (output![0]['label']).toString().substring(2),
+                          style: const TextStyle(
+                            fontSize: 18,
+                            fontWeight: FontWeight.bold,
+                            color: Colors.white,
+                          ),
+                        ),
+                        Text(
+                          'Confidence: ${output![0]['confidence']}',
+                          style: const TextStyle(
+                            fontSize: 16,
+                            color: Colors.white,
+                          ),
+                        ),
+                        Text(
+                          fine,
+                          style: const TextStyle(
+                            fontSize: 16,
+                            color: Colors.white,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+            const SizedBox(height: 100),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                FloatingActionButton(
+                  elevation: 0.0,
+                  backgroundColor: const Color.fromARGB(255, 187, 188, 204),
+                  onPressed: getImageFromGallery,
+                  child: const Icon(
+                    Icons.image,
+                  ),
+                ),
+                const SizedBox(width: 20),
+                FloatingActionButton(
+                  elevation: 0.0,
+                  backgroundColor: const Color.fromARGB(255, 187, 188, 204),
+                  onPressed: getImageFromCamera,
+                  child: const Icon(
+                    Icons.camera,
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(height: 30),
+            const Text(
+              'Created By Ritesh Shandilya',
+              style: TextStyle(
+                fontSize: 14,
+                color: Colors.grey,
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
